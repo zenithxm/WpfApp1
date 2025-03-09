@@ -1,0 +1,97 @@
+﻿<Window x:Class="WpfApp1.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:local="clr-namespace:WpfApp1.View"
+        xmlns:localVM="clr-namespace:WpfApp1.View_Model"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800"
+        Name="parentMain">
+    <Window.Resources>
+        <Style TargetType="Button" x:Key="ToolbarButton">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Margin" Value="3,2,3,2"/>
+            <Setter Property="Padding" Value="2,2,2,2"/>
+            <Setter Property="Image.Opacity" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid>
+                            <Border x:Name="Border" Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{TemplateBinding BorderThickness}" 
+                                    Padding="{TemplateBinding Padding}"
+                                    CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                    Margin="{TemplateBinding Padding}" 
+                                    RecognizesAccessKey="True" 
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Image.Opacity" Value="0.2"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background" Value="DarkGray"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background" Value="DimGray"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+    <Window.DataContext>
+        <localVM:Main />
+    </Window.DataContext>
+    <Grid>
+        <TabControl x:Name="elMainControl"
+            SelectedIndex="{Binding SelectedTab}"
+            ItemsSource="{Binding ListTab}">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel 
+                        Orientation="Horizontal">
+                        <TextBlock Text="{Binding BrowserDataContext.CurrentNameAddress, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                            MaxWidth="100"/>
+                        <Button                             
+                            Width="15"
+                            CommandParameter="{Binding Name}"
+                            Command="{Binding DataContext.ButtonClose, ElementName=parentMain}"
+                            Visibility="{Binding VisibilityBtn}"
+                            Style="{StaticResource ToolbarButton}">
+                            <Image Source="/Resource/close.png" />
+                        </Button>
+                        <Image Source="/Resource/plus.png" 
+                            Width="7" 
+                            Visibility="{Binding ReverseVisibilityBtn}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <local:BrowserControl 
+                        BrowserClass="{Binding BrowserDataContext, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        AddTab="{Binding DataContext.AddTab, ElementName=parentMain}"
+                        />
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding ChangeTab}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </TabControl>
+    </Grid>
+</Window>
+
+<!--AddTab="{Binding DataContext.AddTab, ElementName=parent}"-->

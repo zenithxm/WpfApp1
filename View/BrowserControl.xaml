@@ -1,0 +1,339 @@
+﻿<UserControl x:Class="WpfApp1.View.BrowserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:WpfApp1.View" 
+             xmlns:localVM="clr-namespace:WpfApp1.View_Model"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:wpf="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800"
+             Name="parentBrowser">
+    <UserControl.Resources>
+        <!--<Style TargetType="TextBox">
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="true">
+                    <Setter Property="Background" Value="Pink"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>-->
+        
+        <Style TargetType="Button" x:Key="ToolbarButton">
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Margin" Value="3,2,3,2"/>
+            <Setter Property="Padding" Value="2,2,2,2"/>
+            <Setter Property="Image.Opacity" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid>
+                            <Border x:Name="Border" Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{TemplateBinding BorderThickness}" 
+                                    Padding="{TemplateBinding Padding}"
+                                    CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                    Margin="{TemplateBinding Padding}" 
+                                    RecognizesAccessKey="True" 
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Image.Opacity" Value="0.2"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background" Value="DarkGray"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background" Value="DimGray"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="DataGrid" x:Key="ShowHideSuggestion">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsFocused, ElementName=elSearchTextWithSuggestion}" Value="True">
+                    <Setter Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="StackPanel" x:Key="ToolbarTrigger">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsFocused, ElementName=elButtonMenu}" Value="True">
+                    <Setter Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="MenuItem">
+            <Setter Property="Focusable" Value="False" />
+        </Style>
+
+        <Style TargetType="DataGridCell" >
+            <Setter Property="Focusable" Value="False" />
+        </Style>
+
+        <local:Bool2VisibilityConverter x:Key="Bool2VisibilityConverter"/>
+    </UserControl.Resources>
+    <!--<UserControl.DataContext>
+        <localVM:Browser />
+    </UserControl.DataContext>-->
+    <Grid x:Name="mainGrid" DataContext="{Binding ElementName=parentBrowser}">
+        <Grid x:Name="normalGrid" Panel.ZIndex="0" DataContext="{Binding BrowserClass}" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="120"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition />
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+
+            <!--to give background color for the toolbar-->
+            <Rectangle Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+            Fill="LightGray" />
+
+            <!--left control-->
+            <StackPanel
+            Grid.Row="0" Grid.Column="0"
+            VerticalAlignment="Center"
+            HorizontalAlignment="left"
+            Orientation="Horizontal">
+
+                <Button 
+                Command="{Binding ButtonBack}"
+                IsEnabled="{Binding ShowButtonBackActive, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                Style="{StaticResource ToolbarButton}">
+                    <Image Source="/Resource/arrow-left.png" />
+                </Button>
+
+                <Button 
+                Command="{Binding ButtonFoward}"
+                IsEnabled="{Binding ShowButtonFowardActive, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                Style="{StaticResource ToolbarButton}">
+                    <Image Source="/Resource/arrow-right.png" />
+                </Button>
+
+                <Button 
+                Command="{Binding ButtonRefresh}"
+                Style="{StaticResource ToolbarButton}">
+                    <Image Source="/Resource/refresh.png" />
+                </Button>
+
+            </StackPanel>
+
+            <!--main search box-->
+            <TextBox x:Name="elSearchTextWithSuggestion"
+            Grid.Row="0" Grid.Column="1"
+            Text="{Binding SearchTextWithSuggestion, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+            Margin="0,3,0,3" >
+                <TextBox.InputBindings>
+                    <!--<KeyBinding Key="Enter" Command="{Binding SubmitAddress}" />-->
+                    <KeyBinding Key="Tab" Command="{Binding TakeSuggestionAddress}" />
+                    <KeyBinding Key="Down" Command="{Binding TakeSuggestionAddress}" />
+                </TextBox.InputBindings>
+                <TextBox.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="3" />
+                    </Style>
+                </TextBox.Resources>
+                <i:Interaction.Behaviors>
+                    <local:MoveCursorToEndBehavior />
+                    <local:KeyBindingLostFocusBehavior Key="Enter" Command="{Binding SubmitAddress}"/>
+                </i:Interaction.Behaviors>
+            </TextBox>
+
+            <!--right control-->
+            <StackPanel
+            Grid.Row="0" Grid.Column="2"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Right"
+            Orientation="Horizontal">
+
+                <Button Name="elButtonMenu"
+                Style="{StaticResource ToolbarButton}" >
+                    <Image Source="/Resource/menu.png" />
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="LostFocus">
+                            <i:ChangePropertyAction TargetObject="{Binding ElementName=elIsMainMenuShow}" 
+                            PropertyName="IsChecked" Value="True"/>
+                            <i:ChangePropertyAction TargetObject="{Binding ElementName=elIsHistoryShow}" 
+                            PropertyName="IsChecked" Value="False"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </Button>
+
+            </StackPanel>
+
+            <!--web content-->
+            <wpf:ChromiumWebBrowser
+            Focusable="True"
+            Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+            Address="{Binding ChromeAddress, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+            </wpf:ChromiumWebBrowser>
+
+            <!--to help search what user type-->
+            <TextBox x:Name="elSearchText"
+            Grid.Row="2" Grid.Column="1"
+            Visibility="Collapsed"
+            Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+
+            <!--to help hide or show menu item-->
+            <CheckBox x:Name="elIsHistoryShow" 
+            Grid.Row="2" Grid.Column="1"
+            IsChecked="False"
+            Visibility="Collapsed"/>
+            <CheckBox x:Name="elIsMainMenuShow" 
+            Grid.Row="2" Grid.Column="1"
+            IsChecked="True"
+            Visibility="Collapsed"/>
+        </Grid>
+
+        <Grid x:Name="overlayGrid" Panel.ZIndex="1" DataContext="{Binding BrowserClass}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="120"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="27" />
+                <RowDefinition />
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+
+            <!--to show list suggestion using overlay-->
+            <DataGrid x:Name="elListSuggest" 
+            Grid.Row="1" Grid.Column="1"
+            Focusable="True"
+            ItemsSource="{Binding AddressListName}"
+            SelectedItem="{Binding SelectedSuggestion, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+            ColumnWidth="*"
+            AutoGenerateColumns="False"
+            GridLinesVisibility="None"
+            HeadersVisibility="None"
+            ColumnHeaderHeight="0"
+            VerticalAlignment="Top"
+            RowHeight="25">
+
+                <DataGrid.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" 
+                    Color="LightBlue"/>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="3" />
+                    </Style>
+                </DataGrid.Resources>
+                <DataGrid.Style>
+                    <StaticResource ResourceKey="ShowHideSuggestion"/>
+                </DataGrid.Style>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Width="Auto"/>
+                    <DataGridTextColumn Header="Empty" Width="30"/>
+                    <DataGridTextColumn Header="URL" Binding="{Binding URL, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Width="*"/>
+                </DataGrid.Columns>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseLeftButtonUp">
+                        <i:InvokeCommandAction Command="{Binding ClickSuggestionAddress}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <i:Interaction.Behaviors>
+                    <local:ClearFocusBehavior />
+                </i:Interaction.Behaviors>
+
+            </DataGrid>
+
+            <!--to show list menu using overlay-->
+            <StackPanel x:Name="elContextMenuItem"
+            Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Style="{StaticResource ToolbarTrigger}"
+            Width="Auto">
+                <Border BorderBrush="DimGray" BorderThickness="1"
+                Background="LightGray">
+                    <StackPanel>
+
+                        <StackPanel Visibility="{Binding IsChecked, 
+                            ElementName=elIsMainMenuShow, 
+                            Converter={StaticResource Bool2VisibilityConverter}}">
+                            <MenuItem Header="New Tab">                                
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <i:InvokeCommandAction Command="{Binding AddTab, ElementName=parentBrowser}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </MenuItem>
+                            <Separator/>
+                            <MenuItem Header="Tab History" Name="elMIHistory">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <i:ChangePropertyAction TargetObject="{Binding ElementName=elIsMainMenuShow}" 
+                                        PropertyName="IsChecked" Value="False"/>
+                                        <i:ChangePropertyAction TargetObject="{Binding ElementName=elIsHistoryShow}" 
+                                        PropertyName="IsChecked" Value="True"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </MenuItem>
+                        </StackPanel>
+
+                        <StackPanel Visibility="{Binding IsChecked, 
+                            ElementName=elIsHistoryShow, 
+                            Converter={StaticResource Bool2VisibilityConverter}}">
+                            <MenuItem Header="Close">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <i:ChangePropertyAction TargetObject="{Binding 
+                                            ElementName=elIsMainMenuShow}" 
+                                        PropertyName="IsChecked" Value="True"/>
+                                        <i:ChangePropertyAction TargetObject="{Binding 
+                                            ElementName=elIsHistoryShow}" 
+                                        PropertyName="IsChecked" Value="False"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </MenuItem>
+                            <Separator/>
+                            <ScrollViewer>
+                                <DataGrid
+                                    Focusable="True"
+                                    ColumnWidth="Auto"
+                                    MaxHeight="300"
+                                    ItemsSource="{Binding HistoryListName}"
+                                    SelectedItem="{Binding SelectedHistory, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                    AutoGenerateColumns="False"
+                                    GridLinesVisibility="None"
+                                    HeadersVisibility="None"
+                                    VerticalAlignment="Top">
+
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Name" Binding="{Binding}" Width="Auto"/>
+                                    </DataGrid.Columns>
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseLeftButtonUp">
+                                            <i:InvokeCommandAction Command="{Binding ClickHistoryAddress}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                    <i:Interaction.Behaviors>
+                                        <local:ClearFocusBehavior />
+                                    </i:Interaction.Behaviors>
+                                </DataGrid>
+                            </ScrollViewer>
+                        </StackPanel>
+
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

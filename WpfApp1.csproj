@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="View\BrowserControl - Copy.xaml.cs" />
+    <Compile Remove="View\BrowserWIndow.xaml.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Resource\arrow-left.png" />
+    <None Remove="Resource\arrow-right.png" />
+    <None Remove="Resource\close.png" />
+    <None Remove="Resource\menu.png" />
+    <None Remove="Resource\plus.png" />
+    <None Remove="Resource\refresh.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Remove="View\BrowserWIndow.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CefSharp.Common.NETCore" Version="133.4.21" />
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="133.4.21" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+    <PackageReference Include="ReactiveUI" Version="20.1.63" />
+    <PackageReference Include="ReactiveUI.WPF" Version="20.1.63" />
+    <PackageReference Include="System.Reactive" Version="6.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resource\arrow-left.png" />
+    <Resource Include="Resource\arrow-right.png" />
+    <Resource Include="Resource\close.png" />
+    <Resource Include="Resource\menu.png" />
+    <Resource Include="Resource\plus.png" />
+    <Resource Include="Resource\refresh.png" />
+  </ItemGroup>
+
+</Project>

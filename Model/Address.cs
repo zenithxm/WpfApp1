@@ -177,7 +177,7 @@ namespace WpfApp1.Model
                     List.Add(new AddressItem(tempName, tempAddress, 1));
                 }
 
-                CurrentActiveAddress = tempAddress;
+                CurrentActiveAddress = SetCompleteURL(tempAddress);
                 CurrentNameAddress = tempName;
             }
             catch (Exception ex)
@@ -298,6 +298,33 @@ namespace WpfApp1.Model
                     //for ip
                     result = string.Join('.', tempResult).Split('/')[0];
                 }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return "";
+            }
+        }
+
+        //make sure it complete url
+        public string SetCompleteURL(string URL)
+        {
+            try
+            {
+                string result = URL;
+
+                if (result.IndexOf("http://") < 0 && result.IndexOf("https://") < 0)
+                {
+                    result = "https://" + result;
+                }
+
+                //if (result.IndexOf("http://www.") < 0 && result.IndexOf("https://www.") < 0)
+                //{
+                //    result = result.Replace("http://", "http://www.");
+                //    result = result.Replace("https://", "https://www.");
+                //}
 
                 return result;
             }

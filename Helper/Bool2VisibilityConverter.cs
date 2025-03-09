@@ -8,7 +8,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace WpfApp1.View
+namespace WpfApp1.Helper
 {
     public class Bool2VisibilityConverter : IValueConverter
     {
@@ -20,8 +20,8 @@ namespace WpfApp1.View
                 bool invert = !string.IsNullOrEmpty(parameter?.ToString()) &&
                               parameter.ToString().ToLower() == "invert";
 
-                return invert ? (boolean ? Visibility.Collapsed : Visibility.Visible) :
-                               (boolean ? Visibility.Visible : Visibility.Collapsed);
+                return invert ? boolean ? Visibility.Collapsed : Visibility.Visible :
+                               boolean ? Visibility.Visible : Visibility.Collapsed;
             }
 
             return Visibility.Collapsed;
@@ -35,8 +35,8 @@ namespace WpfApp1.View
                 bool invert = !string.IsNullOrEmpty(parameter?.ToString()) &&
                               parameter.ToString().ToLower() == "invert";
 
-                return invert ? (visibility != Visibility.Visible) :
-                               (visibility == Visibility.Visible);
+                return invert ? visibility != Visibility.Visible :
+                               visibility == Visibility.Visible;
             }
 
             return false;

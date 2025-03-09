@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 
-namespace WpfApp1.View
+namespace WpfApp1.Helper
 {
     [TemplatePart(Name = "PART_ItemsHolder", Type = typeof(Panel))]
     public class TabControlEx : TabControl
@@ -29,9 +29,9 @@ namespace WpfApp1.View
         /// <param name="e"></param>
         private void ItemContainerGenerator_StatusChanged(object sender, EventArgs e)
         {
-            if (this.ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated)
+            if (ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated)
             {
-                this.ItemContainerGenerator.StatusChanged -= ItemContainerGenerator_StatusChanged;
+                ItemContainerGenerator.StatusChanged -= ItemContainerGenerator_StatusChanged;
                 UpdateSelectedItem();
             }
         }
@@ -105,7 +105,7 @@ namespace WpfApp1.View
 
             // show the right child
             foreach (ContentPresenter child in ItemsHolderPanel.Children)
-                child.Visibility = ((child.Tag as TabItem).IsSelected) ? Visibility.Visible : Visibility.Collapsed;
+                child.Visibility = (child.Tag as TabItem).IsSelected ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private ContentPresenter CreateChildContentPresenter(object item)
@@ -120,12 +120,12 @@ namespace WpfApp1.View
 
             // the actual child to be added.  cp.Tag is a reference to the TabItem
             cp = new ContentPresenter();
-            cp.Content = (item is TabItem) ? (item as TabItem).Content : item;
-            cp.ContentTemplate = this.SelectedContentTemplate;
-            cp.ContentTemplateSelector = this.SelectedContentTemplateSelector;
-            cp.ContentStringFormat = this.SelectedContentStringFormat;
+            cp.Content = item is TabItem ? (item as TabItem).Content : item;
+            cp.ContentTemplate = SelectedContentTemplate;
+            cp.ContentTemplateSelector = SelectedContentTemplateSelector;
+            cp.ContentStringFormat = SelectedContentStringFormat;
             cp.Visibility = Visibility.Collapsed;
-            cp.Tag = (item is TabItem) ? item : (this.ItemContainerGenerator.ContainerFromItem(item));
+            cp.Tag = item is TabItem ? item : ItemContainerGenerator.ContainerFromItem(item);
             ItemsHolderPanel.Children.Add(cp);
             return cp;
         }
@@ -152,13 +152,13 @@ namespace WpfApp1.View
 
         protected TabItem GetSelectedTabItem()
         {
-            object selectedItem = base.SelectedItem;
+            object selectedItem = SelectedItem;
             if (selectedItem == null)
                 return null;
 
             TabItem item = selectedItem as TabItem;
             if (item == null)
-                item = base.ItemContainerGenerator.ContainerFromIndex(base.SelectedIndex) as TabItem;
+                item = ItemContainerGenerator.ContainerFromIndex(SelectedIndex) as TabItem;
 
             return item;
         }

@@ -8,7 +8,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using WpfApp1.View_Model;
 
-namespace WpfApp1.View
+namespace WpfApp1.Helper
 {
     public class MoveCursorToEndBehavior : Behavior<TextBox>
     {
@@ -32,10 +32,10 @@ namespace WpfApp1.View
                 //make sure it only move when assign value not when user typing
                 if (textBox != null && textBox.CaretIndex == 0)
                 {
-                    textBox.Dispatcher.BeginInvoke((Action)(() =>
+                    textBox.Dispatcher.BeginInvoke(() =>
                     {
                         textBox.CaretIndex = textBox.Text.Length;
-                    }));
+                    });
                 }
             }
             catch (Exception ex)
@@ -67,10 +67,10 @@ namespace WpfApp1.View
 
                 if (textBox != null)
                 {
-                    textBox.Dispatcher.BeginInvoke((Action)(() =>
+                    textBox.Dispatcher.BeginInvoke(() =>
                     {
                         textBox.SelectAll();
-                    }));
+                    });
                 }
             }
             catch (Exception ex)

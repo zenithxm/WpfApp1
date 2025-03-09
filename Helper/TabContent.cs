@@ -10,7 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Markup;
 
-namespace WpfApp1.View
+namespace WpfApp1.Helper
 {
     /// <summary>
     /// Attached properties for persistent tab control
@@ -109,7 +109,7 @@ namespace WpfApp1.View
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static object GetInternalContentManager(DependencyObject obj)
         {
-            return (object)obj.GetValue(InternalContentManagerProperty);
+            return obj.GetValue(InternalContentManagerProperty);
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -137,7 +137,7 @@ namespace WpfApp1.View
 
             if (!newValue)
             {
-                if (args.OldValue != null && ((bool)args.OldValue))
+                if (args.OldValue != null && (bool)args.OldValue)
                 {
                     throw new NotImplementedException("Cannot change TabContent.IsCached from True to False. Turning tab caching off is not implemented");
                 }
@@ -243,7 +243,7 @@ namespace WpfApp1.View
 
             public void ReplaceContainer(Decorator newBorder)
             {
-                if (Object.ReferenceEquals(_border, newBorder)) return;
+                if (ReferenceEquals(_border, newBorder)) return;
 
                 _border.Child = null; // detach any tab content that old border may hold
                 _border = newBorder;
@@ -262,18 +262,18 @@ namespace WpfApp1.View
                 var tabItem = _tabControl.ItemContainerGenerator.ContainerFromItem(item);
                 if (tabItem == null) return null;
 
-                var cachedContent = TabContent.GetInternalCachedContent(tabItem);
+                var cachedContent = GetInternalCachedContent(tabItem);
                 if (cachedContent == null)
                 {
                     cachedContent = new ContentControl
                     {
                         DataContext = item,
-                        ContentTemplate = TabContent.GetTemplate(_tabControl),
-                        ContentTemplateSelector = TabContent.GetTemplateSelector(_tabControl)
+                        ContentTemplate = GetTemplate(_tabControl),
+                        ContentTemplateSelector = GetTemplateSelector(_tabControl)
                     };
 
                     cachedContent.SetBinding(ContentControl.ContentProperty, new Binding());
-                    TabContent.SetInternalCachedContent(tabItem, cachedContent);
+                    SetInternalCachedContent(tabItem, cachedContent);
                 }
 
                 return cachedContent;

@@ -5,6 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="clr-namespace:WpfApp1.View" 
              xmlns:localVM="clr-namespace:WpfApp1.View_Model"
+             xmlns:helper="clr-namespace:WpfApp1.Helper" 
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:Wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
              mc:Ignorable="d"
@@ -84,7 +85,7 @@
             <Setter Property="Focusable" Value="False" />
         </Style>
 
-        <local:Bool2VisibilityConverter x:Key="Bool2VisibilityConverter"/>
+        <helper:Bool2VisibilityConverter x:Key="Bool2VisibilityConverter"/>
     </UserControl.Resources>
     <!--<UserControl.DataContext>
         <localVM:Browser />
@@ -151,9 +152,9 @@
                     </Style>
                 </TextBox.Resources>
                 <i:Interaction.Behaviors>
-                    <local:MoveCursorToEndBehavior />
-                    <local:GotFocusSelectAllBehavior />
-                    <local:KeyBindingLostFocusBehavior Key="Enter" Command="{Binding SubmitAddress}"/>
+                    <helper:MoveCursorToEndBehavior />
+                    <helper:GotFocusSelectAllBehavior />
+                    <helper:KeyBindingLostFocusBehavior Key="Enter" Command="{Binding SubmitAddress}"/>
                 </i:Interaction.Behaviors>
             </TextBox>
 
@@ -252,7 +253,7 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <i:Interaction.Behaviors>
-                    <local:ClearFocusBehavior />
+                    <helper:ClearFocusBehavior />
                 </i:Interaction.Behaviors>
 
             </DataGrid>
@@ -328,7 +329,7 @@
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                     <i:Interaction.Behaviors>
-                                        <local:ClearFocusBehavior />
+                                        <helper:ClearFocusBehavior />
                                     </i:Interaction.Behaviors>
                                 </DataGrid>
                             </ScrollViewer>

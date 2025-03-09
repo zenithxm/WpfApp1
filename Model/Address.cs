@@ -12,15 +12,17 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Xml.Linq;
 using System.Diagnostics;
+using static System.Net.WebRequestMethods;
 
 namespace WpfApp1.Model
 {
     public class Address : ReactiveObject
     {
-        private string _defaultSearch = "https://www.google.com/search?q=";
+        private static string _defaultSearch = "https://duckduckgo.com/?q=";
+        private static string _defaultHome = "https://duckduckgo.com/";
 
-        //active address in chromium
-        private string _currentActiveAddress = "https://www.google.com/";
+        //active address in webview
+        private string _currentActiveAddress = _defaultHome;
         public string CurrentActiveAddress
         {
             get => _currentActiveAddress;
@@ -92,19 +94,27 @@ namespace WpfApp1.Model
         {
             get
             {
-                var tempList = List;
-                if (!string.IsNullOrEmpty(CurrentText))
+                try
                 {
-                    tempList = List.Where(x => x.Name.ToLower().Contains(CurrentText.ToLower()) ||
-                        x.URL.ToLower().Contains(CurrentText.ToLower())).ToList();
-                }
+                    var tempList = List;
+                    if (!string.IsNullOrEmpty(CurrentText))
+                    {
+                        tempList = List.Where(x => x.Name.ToLower().Contains(CurrentText.ToLower()) ||
+                            x.URL.ToLower().Contains(CurrentText.ToLower())).ToList();
+                    }
 
-                _filterName = tempList.OrderByDescending(x => x.Visit)
-                    //.Select(x => x.Name + " - " + x.URL)
-                    .Distinct()
-                    .Take(7)
-                    .ToList();
-                return _filterName;
+                    _filterName = tempList.OrderByDescending(x => x.Visit)
+                        //.Select(x => x.Name + " - " + x.URL)
+                        .Distinct()
+                        .Take(7)
+                        .ToList();
+                    return _filterName;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    return null;
+                }
             }
         }
 
@@ -133,119 +143,169 @@ namespace WpfApp1.Model
         //to add address into suggestion and history
         public void AddAddress(string address)
         {
-            if (string.IsNullOrEmpty(address))
-                return;
-
-            string tempName;
-            string tempAddress;
-
-            if (IsValidURL(address))
+            try
             {
-                tempAddress = address;
-                tempName = GetDomainName(address);
-            }
-            else
-            {
-                tempName = address;
-                tempAddress = _defaultSearch + address.Replace(' ', '+');
-            }
+                if (string.IsNullOrEmpty(address))
+                    return;
 
-            if (tempAddress.IndexOf(_defaultSearch) >= 0)
-            {
-                tempAddress = tempAddress.Split('&')[0];
-            }
+                string tempName;
+                string tempAddress;
 
-            var existingAddress = List.FirstOrDefault(x => x.URL == tempAddress);
-            if (existingAddress != null)
-            {
-                existingAddress.Visit += 1;
-            }
-            else
-            {
-                List.Add(new AddressItem(tempName, tempAddress, 1));
-            }
+                if (IsValidURL(address))
+                {
+                    tempAddress = address;
+                    tempName = GetDomainName(address);
+                }
+                else
+                {
+                    tempName = address;
+                    tempAddress = _defaultSearch + address.Replace(' ', '+');
+                }
 
-            CurrentActiveAddress = tempAddress;
-            CurrentNameAddress = tempName;
+                if (tempAddress.IndexOf(_defaultSearch) >= 0)
+                {
+                    tempAddress = tempAddress.Split('&')[0];
+                }
 
+                var existingAddress = List.FirstOrDefault(x => x.URL == tempAddress);
+                if (existingAddress != null)
+                {
+                    existingAddress.Visit += 1;
+                }
+                else
+                {
+                    List.Add(new AddressItem(tempName, tempAddress, 1));
+                }
+
+                CurrentActiveAddress = tempAddress;
+                CurrentNameAddress = tempName;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
 
         //return first or next suggestion
         public AddressItem TakeSuggestion()
         {
-            AddressItem result = null;
-            if (_filterName.Count > 0 && _filterName.Count > IndexSuggestion)
+            try
             {
-                result = _filterName[IndexSuggestion];
-                IndexSuggestion++;
-            }
+                AddressItem result = null;
+                if (_filterName.Count > 0 && _filterName.Count > IndexSuggestion)
+                {
+                    result = _filterName[IndexSuggestion];
+                    IndexSuggestion++;
+                }
 
-            return result;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return null;
+            }
         }
 
         //add history
         public void AddHistory()
         {
-            //if it try insert same history with current index, ignore it, it mean from back or foward or refresh
-            if (ListHistory.Count == 0 || ListHistory[IndexHistory - 1] != CurrentActiveAddress)
+            try
             {
-                if (ListHistory.Count > IndexHistory)
-                    ListHistory = ListHistory.Take(IndexHistory).ToList();
+                //ignore homepage
+                if (ListHistory.Count == 0 && CurrentActiveAddress == _defaultHome) return;
 
-                ListHistory.Add(CurrentActiveAddress);
-                ListHistoryMain.Add(CurrentActiveAddress);
-                IndexHistory++;
+                //if it try insert same history with current index, ignore it, it mean from back or foward or refresh
+                if (ListHistory.Count == 0 || ListHistory[IndexHistory - 1] != CurrentActiveAddress)
+                {
+                    if (ListHistory.Count > IndexHistory)
+                        ListHistory = ListHistory.Take(IndexHistory).ToList();
+
+                    ListHistory.Add(CurrentActiveAddress);
+                    ListHistoryMain.Add(CurrentActiveAddress);
+                    IndexHistory++;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
             }
         }
 
         //take history
         public string TakeHistory(bool isBack)
         {
-            string result = "";
-
-            if (isBack && IndexHistory > 1)
+            try
             {
-                IndexHistory--;
-                result = ListHistory[IndexHistory - 1];
-            }
-            else if (!isBack && ListHistory.Count > IndexHistory)
-            {
-                IndexHistory++;
-                result = ListHistory[IndexHistory - 1];
-            }
+                string result = "";
 
-            return result;
+                if (isBack && IndexHistory > 1)
+                {
+                    IndexHistory--;
+                    result = ListHistory[IndexHistory - 1];
+                }
+                else if (!isBack && ListHistory.Count > IndexHistory)
+                {
+                    IndexHistory++;
+                    result = ListHistory[IndexHistory - 1];
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return "";
+            }
         }
 
         //check string is acceptable URL
         public bool IsValidURL(string URL)
         {
-            string Pattern = @"^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$";
-            Regex Rgx = new Regex(Pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            return Rgx.IsMatch(URL);
+            try
+            {
+                string Pattern = @"^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$";
+                Regex Rgx = new Regex(Pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                return Rgx.IsMatch(URL);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return false;
+            }
         }
 
         //get domain name
         public string GetDomainName(string URL)
         {
-            string result = "";
-            var tempResult = URL.Replace("http://", "").Replace("https://", "").Replace("www.", "").Split('.');
-            if (URL.IndexOf(_defaultSearch) >= 0)
+            try
             {
-                //for search on google get the word instead
-                result = URL.Replace(_defaultSearch, "").Split('&')[0];
-            }
-            else if (!tempResult[0].All(char.IsDigit))
-            {
-                result = tempResult[0];
-            }
-            else
-            {
-                //for ip
-                result = string.Join('.', tempResult).Split('/')[0];
-            }
+                string result = "";
+                var tempResult = URL.Replace("http://", "").Replace("https://", "").Replace("www.", "").Split('.');
+                URL = URL.Replace("t=h_&", "");
 
-            return result;
+                if (URL.IndexOf(_defaultSearch) >= 0)
+                {
+                    //for search on web get the word instead
+                    result = URL.Replace(_defaultSearch, "").Split('&')[0];
+                }
+                else if (!tempResult[0].All(char.IsDigit))
+                {
+                    result = tempResult[0];
+                }
+                else
+                {
+                    //for ip
+                    result = string.Join('.', tempResult).Split('/')[0];
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return "";
+            }
         }
     }
 

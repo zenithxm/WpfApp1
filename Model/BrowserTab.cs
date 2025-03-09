@@ -61,48 +61,71 @@ namespace WpfApp1.Model
 
         public BrowserTab ()
         {
-            _totalTabCreated = 0;
-            IndexAvailableTab = 0;
-            List = new List<BrowserTabItem>();
+            try
+            {
+                _totalTabCreated = 0;
+                IndexAvailableTab = 0;
+                List = new List<BrowserTabItem>();
+
+                ListSuggestion.Add(new AddressItem("Apple", "https://duckduckgo.com/?q=Apple", 1));
+                ListSuggestion.Add(new AddressItem("Banana", "https://duckduckgo.com/?q=Banana", 1));
+                ListSuggestion.Add(new AddressItem("Orange", "https://duckduckgo.com/?q=Orange", 1));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
 
         //when useer add tab
         public void AddTab(string header)
         {
-            _totalTabCreated++;
-
-            BrowserTabItem lastTab = null;
-            if (List != null && List.Count() > 0)
+            try
             {
-                lastTab = List[List.Count() - 1];
-                List.RemoveAt(List.Count() - 1);
+                _totalTabCreated++;
+
+                BrowserTabItem lastTab = null;
+                if (List != null && List.Count() > 0)
+                {
+                    lastTab = List[List.Count() - 1];
+                    List.RemoveAt(List.Count() - 1);
+                }
+
+                string tempName = "bTab" + _totalTabCreated.ToString();
+                List.Add(new BrowserTabItem(tempName, header, ListHistory, ListSuggestion));
+
+                if (lastTab != null) List.Add(lastTab);
             }
-
-            string tempName = "bTab" + _totalTabCreated.ToString();
-            List.Add(new BrowserTabItem(tempName, header, ListHistory, ListSuggestion));
-            
-            if (lastTab != null) List.Add(lastTab);
-
-            Debug.WriteLine(List.Count().ToString() + " - " + header + " - " + tempName);
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
 
         //when user close tab
         public void RemoveTab(string name)
         {
-            BrowserTabItem? tempBrowserTabItem = List.Where(x => x.Name == name).FirstOrDefault();
-            IndexAvailableTab = 0;
-            if (tempBrowserTabItem != null)
+            try
             {
-                IndexAvailableTab = List.IndexOf(tempBrowserTabItem);
-                List.Remove(tempBrowserTabItem);
-                IndexAvailableTab--;
+                BrowserTabItem? tempBrowserTabItem = List.Where(x => x.Name == name).FirstOrDefault();
+                IndexAvailableTab = 0;
+                if (tempBrowserTabItem != null)
+                {
+                    IndexAvailableTab = List.IndexOf(tempBrowserTabItem);
+                    List.Remove(tempBrowserTabItem);
+                    IndexAvailableTab--;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
             }
         }
     }
 
     public class BrowserTabItem : ReactiveObject
     {
-        private string _name;
+        private string _name = "";
         public string Name
         {
             get => _name;
@@ -131,7 +154,7 @@ namespace WpfApp1.Model
         }
 
         //for datacontext
-        private Browser _browserDataContext;
+        private Browser _browserDataContext = new();
         public Browser BrowserDataContext
         {
             get => _browserDataContext;
@@ -140,20 +163,27 @@ namespace WpfApp1.Model
 
         public BrowserTabItem(string name, string header, List<string> listHistory, List<AddressItem> listSuggestion)
         {
-            Name = name;
-            Header = header;
+            try
+            {
+                Name = name;
+                Header = header;
 
-            if (Header != "+")
-            {
-                VisibilityBtn = Visibility.Visible;
-                ReverseVisibilityBtn = Visibility.Collapsed;
-                BrowserDataContext = new Browser(listHistory, listSuggestion, Header);
+                if (Header != "+")
+                {
+                    VisibilityBtn = Visibility.Visible;
+                    ReverseVisibilityBtn = Visibility.Collapsed;
+                    BrowserDataContext = new Browser(listHistory, listSuggestion, Header);
+                }
+                else
+                {
+                    Name = "+";
+                    VisibilityBtn = Visibility.Collapsed;
+                    ReverseVisibilityBtn = Visibility.Visible;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Name = "+";
-                VisibilityBtn = Visibility.Collapsed;
-                ReverseVisibilityBtn = Visibility.Visible;
+                Debug.WriteLine(ex.Message);
             }
         }
     }

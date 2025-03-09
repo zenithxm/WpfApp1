@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:WpfApp1.View"
         xmlns:localVM="clr-namespace:WpfApp1.View_Model"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="BrowserGO" Height="450" Width="800"
         Name="parentMain">
     <Window.Resources>
         <Style TargetType="Button" x:Key="ToolbarButton">

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -31,11 +32,16 @@ namespace WpfApp1.View_Model
             get => _searchText;
             set
             {
-                if (this.RaiseAndSetIfChanged(ref _searchText, value) != null)
+                try
                 {
+                    this.RaiseAndSetIfChanged(ref _searchText, value);
                     Items.CurrentText = _searchText;
                     AddressListName = new ObservableCollection<AddressItem>(Items.FilterName);
                     ShowListSuggestion = true;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
                 }
             }
         }
@@ -47,8 +53,9 @@ namespace WpfApp1.View_Model
             get => _searchTextWithSuggestion;
             set
             {
-                if (this.RaiseAndSetIfChanged(ref _searchTextWithSuggestion, value) != null)
+                try
                 {
+                    this.RaiseAndSetIfChanged(ref _searchTextWithSuggestion, value);
                     Items.CurrentTextWithSuggestion = _searchTextWithSuggestion;
 
                     //update SearchText if it is user typing
@@ -56,6 +63,10 @@ namespace WpfApp1.View_Model
                     else isSuggestion = false;
 
                     AddressListName = new ObservableCollection<AddressItem>(Items.FilterName);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
                 }
             }
         }
@@ -77,15 +88,16 @@ namespace WpfApp1.View_Model
         }
 
         //to set browser address
-        private string _chromeAddress;
-        public string ChromeAddress
+        private string _webViewAddress;
+        public string WebViewAddress
         {
-            get => _chromeAddress;
+            get => _webViewAddress;
             set
             {
-                if (this.RaiseAndSetIfChanged(ref _chromeAddress, value) != null)
+                try
                 {
-                    SearchTextWithSuggestion = _chromeAddress;
+                    this.RaiseAndSetIfChanged(ref _webViewAddress, value);
+                    SearchTextWithSuggestion = _webViewAddress;
                     Items.AddAddress(SearchText);
                     Items.AddHistory();
                     HistoryListName = new ObservableCollection<string>(Items.ListHistoryMain.AsEnumerable().Reverse());
@@ -95,6 +107,10 @@ namespace WpfApp1.View_Model
 
                     CurrentNameAddress = Items.CurrentNameAddress;
                 }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
             }
         }
 
@@ -103,7 +119,18 @@ namespace WpfApp1.View_Model
         public string CurrentNameAddress
         {
             get => _currentNameAddress;
-            set => this.RaiseAndSetIfChanged(ref _currentNameAddress, value);
+            set
+            {
+                try
+                {
+                    if (Items.ListHistory.Count > 0)
+                        this.RaiseAndSetIfChanged(ref _currentNameAddress, value);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+            }
         }
 
         //to keep track list suggestion show or hide
@@ -155,10 +182,17 @@ namespace WpfApp1.View_Model
         //when user press 'enter'
         public ReactiveCommand<Unit, Unit> SubmitAddress
         {
-            get => ReactiveCommand.Create(() => { 
-                Items.AddAddress(SearchTextWithSuggestion);
-                ChromeAddress = Items.CurrentActiveAddress;
-                ShowListSuggestion = false;
+            get => ReactiveCommand.Create(() => {
+                try
+                {
+                    Items.AddAddress(SearchTextWithSuggestion);
+                    WebViewAddress = Items.CurrentActiveAddress;
+                    ShowListSuggestion = false;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
             });
         }
 
@@ -166,16 +200,24 @@ namespace WpfApp1.View_Model
         public ReactiveCommand<Unit, Unit> TakeSuggestionAddress
         {
             get => ReactiveCommand.Create(() => {
-                if (ShowListSuggestion)
+                try
                 {
-                    AddressItem result = Items.TakeSuggestion();
-                    if (result != null)
+                    if (ShowListSuggestion)
                     {
-                        isSuggestion = true;
-                        SearchTextWithSuggestion = result.URL;
-                        SelectedSuggestion = result;
+                        AddressItem result = Items.TakeSuggestion();
+                        if (result != null)
+                        {
+                            isSuggestion = true;
+                            SearchTextWithSuggestion = result.URL;
+                            SelectedSuggestion = result;
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+
                 //else
                 //{
                 //    // Simulate the default Tab behavior
@@ -192,9 +234,19 @@ namespace WpfApp1.View_Model
         public ReactiveCommand<Unit, Unit> ClickSuggestionAddress
         {
             get => ReactiveCommand.Create(() => {
-                AddressItem tempSuggest = SelectedSuggestion as AddressItem;
-                SearchTextWithSuggestion = tempSuggest.URL;
-                SubmitAddress.Execute().Subscribe();
+                try
+                {
+                    AddressItem tempSuggest = SelectedSuggestion as AddressItem;
+                    if (tempSuggest != null)
+                    {
+                        SearchTextWithSuggestion = tempSuggest.URL;
+                        SubmitAddress.Execute().Subscribe();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
             });
         }
 
@@ -202,9 +254,19 @@ namespace WpfApp1.View_Model
         public ReactiveCommand<Unit, Unit> ClickHistoryAddress
         {
             get => ReactiveCommand.Create(() => {
-                string tempHistory = SelectedHistory as string;
-                SearchTextWithSuggestion = tempHistory;
-                SubmitAddress.Execute().Subscribe();
+                try
+                {
+                    string tempHistory = SelectedHistory as string;
+                    if (tempHistory != null)
+                    {
+                        SearchTextWithSuggestion = tempHistory;
+                        SubmitAddress.Execute().Subscribe();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
             });
         }
 
@@ -212,8 +274,15 @@ namespace WpfApp1.View_Model
         public ReactiveCommand<Unit, Unit> ButtonBack
         {
             get => ReactiveCommand.Create(() => {
-                SearchTextWithSuggestion = Items.TakeHistory(true);
-                SubmitAddress.Execute().Subscribe();
+                try
+                {
+                    SearchTextWithSuggestion = Items.TakeHistory(true);
+                    SubmitAddress.Execute().Subscribe();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
             });
         }
 
@@ -221,8 +290,15 @@ namespace WpfApp1.View_Model
         public ReactiveCommand<Unit, Unit> ButtonFoward
         {
             get => ReactiveCommand.Create(() => {
-                SearchTextWithSuggestion = Items.TakeHistory(false);
-                SubmitAddress.Execute().Subscribe();
+                try
+                {
+                    SearchTextWithSuggestion = Items.TakeHistory(false);
+                    SubmitAddress.Execute().Subscribe();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
             });
         }
 
@@ -230,36 +306,62 @@ namespace WpfApp1.View_Model
         public ReactiveCommand<Unit, Unit> ButtonRefresh
         {
             get => ReactiveCommand.Create(() => {
-                SubmitAddress.Execute().Subscribe();
+                try
+                {
+                    SubmitAddress.Execute().Subscribe();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
             });
         }
 
         public Browser(List<string> listHistory, List<AddressItem> listSuggestion, string header)
         {
-            Items.ListHistoryMain = listHistory;
-            Items.List = listSuggestion;
-            CurrentNameAddress = header;
-            Initialize();
+            try
+            {
+                Items.ListHistoryMain = listHistory;
+                Items.List = listSuggestion;
+                Initialize();
+                _currentNameAddress = header;
+                CurrentNameAddress = header;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
 
         public Browser()
         {
-            Items.ListHistoryMain = new List<string>();
-            Items.List = new List<AddressItem>();
-            CurrentNameAddress = "";
-            Initialize();
+            try
+            {
+                Items.ListHistoryMain = new List<string>();
+                Items.List = new List<AddressItem>();
+                Initialize();
+                CurrentNameAddress = "";
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
 
         private void Initialize()
         {
-            ChromeAddress = Items.CurrentActiveAddress;
-            ShowListSuggestion = false;
-            isSuggestion = false;
-            Items.AddAddress("Apple");
-            Items.AddAddress("Banana");
-            Items.AddAddress("Orange");
-            Items.CurrentText = SearchText;
-            AddressListName = new ObservableCollection<AddressItem>(Items.FilterName);
+            try
+            {
+                WebViewAddress = Items.CurrentActiveAddress;
+                ShowListSuggestion = false;
+                isSuggestion = false;
+                Items.CurrentText = SearchText;
+                AddressListName = new ObservableCollection<AddressItem>(Items.FilterName);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
     }
 }

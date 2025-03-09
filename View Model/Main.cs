@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -49,24 +50,25 @@ namespace WpfApp1.View_Model
         public ObservableCollection<string> ListWindowHistory
         {
             get => _listWindowHistory;
-            set
-            {
-                if(this.RaiseAndSetIfChanged(ref _listWindowHistory, value) != null)
-                {
-                    return;
-                }
-            }
+            set => this.RaiseAndSetIfChanged(ref _listWindowHistory, value);
         }
 
         //when user click close
         public ReactiveCommand<string, Unit> ButtonClose
         {
             get => ReactiveCommand.Create<string>((name) => {
-                Items.RemoveTab(name);
-                ListTab = new ObservableCollection<BrowserTabItem>(Items.List);
-                SelectedTab = Items.IndexAvailableTab;
+                try
+                {
+                    Items.RemoveTab(name);
+                    ListTab = new ObservableCollection<BrowserTabItem>(Items.List);
+                    SelectedTab = Items.IndexAvailableTab;
 
-                if (ListTab.Count() <= 1) Application.Current.Shutdown();
+                    if (ListTab.Count() <= 1) Application.Current.Shutdown();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
             });
         }
 
@@ -74,9 +76,16 @@ namespace WpfApp1.View_Model
         public ReactiveCommand<Unit, Unit> ChangeTab
         {
             get => ReactiveCommand.Create(() => {
-                if (SelectedTab != 0 && SelectedTab == Items.List.Count() - 1)
+                try
                 {
-                    AddTab.Execute().Subscribe();
+                    if (SelectedTab != 0 && SelectedTab == Items.List.Count() - 1)
+                    {
+                        AddTab.Execute().Subscribe();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
                 }
             });
         }
@@ -85,11 +94,18 @@ namespace WpfApp1.View_Model
         public ReactiveCommand<Unit, Unit> AddTab
         {
             get => ReactiveCommand.Create(() => {
-                Items.AddTab("New Tab");
-                ListTab = new ObservableCollection<BrowserTabItem>(Items.List);
-                SelectedTab = ListTab.Count() - 2;
+                try
+                {
+                    Items.AddTab("New Tab");
+                    ListTab = new ObservableCollection<BrowserTabItem>(Items.List);
+                    SelectedTab = ListTab.Count() - 2;
 
-                if (SelectedTab <= 0) SelectedTab = 0;
+                    if (SelectedTab <= 0) SelectedTab = 0;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
             });
         }
 
@@ -100,9 +116,16 @@ namespace WpfApp1.View_Model
 
         private void Initialize()
         {
-            Items.AddTab("+");
-            Items.AddTab("New Window");
-            ListTab = new ObservableCollection<BrowserTabItem>(Items.List);
+            try
+            {
+                Items.AddTab("+");
+                Items.AddTab("New Window");
+                ListTab = new ObservableCollection<BrowserTabItem>(Items.List);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
 
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xaml.Behaviors;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -25,14 +26,56 @@ namespace WpfApp1.View
 
         private void OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            var textBox = sender as TextBox;
-            //make sure it only move when assign value not when user typing
-            if (textBox != null && textBox.CaretIndex == 0)
+            try
             {
-                textBox.Dispatcher.BeginInvoke((Action)(() =>
+                var textBox = sender as TextBox;
+                //make sure it only move when assign value not when user typing
+                if (textBox != null && textBox.CaretIndex == 0)
                 {
-                    textBox.CaretIndex = textBox.Text.Length;
-                }));
+                    textBox.Dispatcher.BeginInvoke((Action)(() =>
+                    {
+                        textBox.CaretIndex = textBox.Text.Length;
+                    }));
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+    }
+
+    public class GotFocusSelectAllBehavior : Behavior<TextBox>
+    {
+        protected override void OnAttached()
+        {
+            base.OnAttached();
+            AssociatedObject.GotFocus += GotFocusChanged;
+        }
+
+        protected override void OnDetaching()
+        {
+            base.OnDetaching();
+            AssociatedObject.GotFocus -= GotFocusChanged;
+        }
+
+        private void GotFocusChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                var textBox = sender as TextBox;
+
+                if (textBox != null)
+                {
+                    textBox.Dispatcher.BeginInvoke((Action)(() =>
+                    {
+                        textBox.SelectAll();
+                    }));
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
             }
         }
     }
@@ -53,12 +96,19 @@ namespace WpfApp1.View
 
         private void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            var control = sender as DataGrid;
-
-            if (control != null)
+            try
             {
-                Keyboard.Focus(control);
-                Keyboard.ClearFocus();
+                var control = sender as DataGrid;
+
+                if (control != null)
+                {
+                    Keyboard.Focus(control);
+                    Keyboard.ClearFocus();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
             }
         }
     }
@@ -79,12 +129,19 @@ namespace WpfApp1.View
 
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
-            var control = sender as TextBox;
-
-            if (control != null && e.Key == Key.Enter)
+            try
             {
-                Keyboard.Focus(control);
-                Keyboard.ClearFocus();
+                var control = sender as TextBox;
+
+                if (control != null && e.Key == Key.Enter)
+                {
+                    Keyboard.Focus(control);
+                    Keyboard.ClearFocus();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
             }
         }
     }
@@ -123,34 +180,41 @@ namespace WpfApp1.View
 
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key)
+            try
             {
-                if (Command?.CanExecute(null) == true)
+                if (e.Key == Key)
                 {
-                    Command.Execute(null);
-
-                    // Ensure the focus change is done on the UI thread
-                    Application.Current.Dispatcher.Invoke(() =>
+                    if (Command?.CanExecute(null) == true)
                     {
-                        DispatcherTimer timer = new DispatcherTimer
-                        {
-                            Interval = TimeSpan.FromMilliseconds(100)
-                        };
-                        timer.Tick += (s, ev) =>
-                        {
-                            timer.Stop(); 
-                            
-                            var control = sender as TextBox;
+                        Command.Execute(null);
 
-                            if (control != null)
+                        // Ensure the focus change is done on the UI thread
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            DispatcherTimer timer = new DispatcherTimer
                             {
-                                Keyboard.Focus(control);
-                                Keyboard.ClearFocus();
-                            }
-                        };
-                        timer.Start();
-                    });
+                                Interval = TimeSpan.FromMilliseconds(100)
+                            };
+                            timer.Tick += (s, ev) =>
+                            {
+                                timer.Stop();
+
+                                var control = sender as TextBox;
+
+                                if (control != null)
+                                {
+                                    Keyboard.Focus(control);
+                                    Keyboard.ClearFocus();
+                                }
+                            };
+                            timer.Start();
+                        });
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
             }
         }
     }

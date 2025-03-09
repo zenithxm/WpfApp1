@@ -30,7 +30,7 @@ namespace WpfApp1.Model
         }
 
         //name header tab
-        private string _currentNameAddress;
+        private string _currentNameAddress = "";
         public string CurrentNameAddress
         {
             get => _currentNameAddress;
@@ -38,7 +38,7 @@ namespace WpfApp1.Model
         }
 
         //to filter suggestion list
-        private string _currentText;
+        private string _currentText = "";
         public string CurrentText
         {
             get => _currentText;
@@ -50,7 +50,7 @@ namespace WpfApp1.Model
         }
 
         //to show current suggestion or user input
-        private string _currentTextWithSuggestion;
+        private string _currentTextWithSuggestion = "";
         public string CurrentTextWithSuggestion
         {
             get => _currentTextWithSuggestion;
@@ -67,7 +67,7 @@ namespace WpfApp1.Model
                 _indexSuggestion = value;
 
                 if (_filterName != null)
-                    if (_indexSuggestion >= _filterName.Count) 
+                    if (_indexSuggestion >= _filterName.Count)
                         _indexSuggestion = 0;
             }
         }
@@ -81,15 +81,15 @@ namespace WpfApp1.Model
         }
 
         //list object address contain all info
-        private List<AddressItem> _list;
+        private List<AddressItem> _list = new();
         public List<AddressItem> List
-        { 
-            get => _list; 
-            set => _list = value; 
+        {
+            get => _list;
+            set => _list = value;
         }
 
         //list address name and url for list suggestion
-        private List<AddressItem> _filterName;
+        private List<AddressItem> _filterName = new();
         public List<AddressItem> FilterName
         {
             get
@@ -119,7 +119,7 @@ namespace WpfApp1.Model
         }
 
         //list url address for back and foward history
-        private List<string> _listHistory = new List<string>();
+        private List<string> _listHistory = new();
         public List<string> ListHistory
         {
             get => _listHistory;
@@ -127,7 +127,7 @@ namespace WpfApp1.Model
         }
 
         //list url address for all history 
-        private List<string> _listHistoryMain;
+        private List<string> _listHistoryMain = new();
         public List<string> ListHistoryMain
         {
             get => _listHistoryMain;
@@ -311,14 +311,14 @@ namespace WpfApp1.Model
 
     public class AddressItem
     {
-        private string _name;
+        private string _name = "";
         public string Name
         {
             get => _name;
             set => _name = value;
         }
 
-        private string _url;
+        private string _url = "";
         public string URL
         {
             get => _url;

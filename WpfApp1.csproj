@@ -2,11 +2,13 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <Platforms>AnyCPU;x64</Platforms>
+    <SupportedOSPlatformVersion>10.0.26100.0</SupportedOSPlatformVersion> 
+  
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,10 +32,12 @@
   <ItemGroup>
     <PackageReference Include="CefSharp.Common.NETCore" Version="133.4.21" />
     <PackageReference Include="CefSharp.Wpf.NETCore" Version="133.4.21" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3065.39" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="ReactiveUI" Version="20.1.63" />
     <PackageReference Include="ReactiveUI.WPF" Version="20.1.63" />
     <PackageReference Include="System.Reactive" Version="6.0.1" />
+    <PackageReference Include="System.Text.Json" Version="9.0.2" />    
   </ItemGroup>
 
   <ItemGroup>

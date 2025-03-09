@@ -25,7 +25,5 @@ namespace WpfApp1.View
         {
             InitializeComponent();
         }
-
-        public ICommand add;
     }
 }

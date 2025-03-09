@@ -36,7 +36,7 @@ namespace WpfApp1.Model
         }
 
         //list object tab
-        private List<BrowserTabItem> _list;
+        private List<BrowserTabItem> _list = new();
         public List<BrowserTabItem> List
         { 
             get => _list; 
@@ -44,7 +44,7 @@ namespace WpfApp1.Model
         }
 
         //list history for all tab
-        private List<string> _listHistory = new List<string>();
+        private List<string> _listHistory = new();
         public List<string> ListHistory
         {
             get => _listHistory;
@@ -52,7 +52,7 @@ namespace WpfApp1.Model
         }
 
         //list suggestion for all tab
-        private List<AddressItem> _listSuggestion = new List<AddressItem>();
+        private List<AddressItem> _listSuggestion = new();
         public List<AddressItem> ListSuggestion
         {
             get => _listSuggestion;
@@ -84,17 +84,18 @@ namespace WpfApp1.Model
             {
                 _totalTabCreated++;
 
-                BrowserTabItem lastTab = null;
-                if (List != null && List.Count() > 0)
+                if (List != null)
                 {
-                    lastTab = List[List.Count() - 1];
-                    List.RemoveAt(List.Count() - 1);
+                    string tempName = "bTab" + _totalTabCreated.ToString();
+                    List.Add(new BrowserTabItem(tempName, header, ListHistory, ListSuggestion));
+
+                    if (header != "+")
+                    {
+                        BrowserTabItem lastTab = List[List.Count() - 2];
+                        List.RemoveAt(List.Count() - 2);
+                        List.Add(lastTab);
+                    }
                 }
-
-                string tempName = "bTab" + _totalTabCreated.ToString();
-                List.Add(new BrowserTabItem(tempName, header, ListHistory, ListSuggestion));
-
-                if (lastTab != null) List.Add(lastTab);
             }
             catch (Exception ex)
             {

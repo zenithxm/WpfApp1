@@ -26,7 +26,7 @@ namespace WpfApp1.View_Model
         private bool isSuggestion;
 
         //to know user input
-        private string _searchText;
+        private string _searchText = "";
         public string SearchText
         {
             get => _searchText;
@@ -47,7 +47,7 @@ namespace WpfApp1.View_Model
         }
 
         //to show suggestion user select from tab
-        private string _searchTextWithSuggestion;
+        private string _searchTextWithSuggestion = "";
         public string SearchTextWithSuggestion
         {
             get => _searchTextWithSuggestion;
@@ -88,7 +88,7 @@ namespace WpfApp1.View_Model
         }
 
         //to set browser address
-        private string _webViewAddress;
+        private string _webViewAddress = "";
         public string WebViewAddress
         {
             get => _webViewAddress;
@@ -115,7 +115,7 @@ namespace WpfApp1.View_Model
         }
 
         //to keep track current name address for header
-        private string _currentNameAddress;
+        private string _currentNameAddress = "";
         public string CurrentNameAddress
         {
             get => _currentNameAddress;

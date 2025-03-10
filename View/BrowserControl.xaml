@@ -154,7 +154,10 @@
                 <i:Interaction.Behaviors>
                     <helper:MoveCursorToEndBehavior />
                     <helper:GotFocusSelectAllBehavior />
-                    <helper:KeyBindingLostFocusBehavior Key="Enter" Command="{Binding SubmitAddress}"/>
+                    <helper:KeyBindingLostFocusBehavior 
+                    Key="Enter" 
+                    Command="{Binding SubmitAddress}"
+                    TargetFocus="{Binding ElementName=elListSuggest}"/>
                 </i:Interaction.Behaviors>
             </TextBox>
 

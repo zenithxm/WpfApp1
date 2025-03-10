@@ -154,6 +154,9 @@ namespace WpfApp1.Helper
         public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(
             "Command", typeof(ICommand), typeof(KeyBindingLostFocusBehavior), new PropertyMetadata(default(ICommand)));
 
+        public static readonly DependencyProperty TargetFocusProperty = DependencyProperty.Register(
+            "TargetFocus", typeof(object), typeof(KeyBindingLostFocusBehavior), new PropertyMetadata(default(object)));
+
         public Key Key
         {
             get => (Key)GetValue(KeyProperty);
@@ -164,6 +167,12 @@ namespace WpfApp1.Helper
         {
             get => (ICommand)GetValue(CommandProperty);
             set => SetValue(CommandProperty, value);
+        }
+
+        public object TargetFocus
+        {
+            get => (object)GetValue(TargetFocusProperty);
+            set => SetValue(TargetFocusProperty, value);
         }
 
         protected override void OnAttached()
@@ -199,11 +208,11 @@ namespace WpfApp1.Helper
                             {
                                 timer.Stop();
 
-                                var control = sender as TextBox;
+                                var target = TargetFocus as UIElement;
 
-                                if (control != null)
+                                if (target != null)
                                 {
-                                    Keyboard.Focus(control);
+                                    Keyboard.Focus(target);
                                     Keyboard.ClearFocus();
                                 }
                             };

@@ -184,7 +184,7 @@
             </StackPanel>
 
             <!--web content-->
-            <Wpf:WebView2CompositionControl
+            <Wpf:WebView2CompositionControl x:Name="elWebView"
             Focusable="True"
             Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
             Source="{Binding WebViewAddress, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">

@@ -346,7 +346,7 @@ namespace WpfApp1.Helper
             private void EnsureCachedContent(object item)
             {
                 var tabItem = _tabControl.ItemContainerGenerator.ContainerFromItem(item);
-                if (tabItem != null && !ReferenceEquals(tabItem, GetInternalCachedContent(tabItem)))
+                if (tabItem != null)
                 {
                     if (GetInternalCachedContent(tabItem) == null)
                     {

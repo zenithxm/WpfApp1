@@ -72,6 +72,25 @@ namespace WpfApp1.View_Model
             });
         }
 
+        //when user press shortcut close
+        public ReactiveCommand<Unit, Unit> ShortcutClose
+        {
+            get => ReactiveCommand.Create(() => {
+                try
+                {
+                    Items.RemoveTab(SelectedTab);
+                    ListTab = new ObservableCollection<BrowserTabItem>(Items.List);
+                    SelectedTab = Items.IndexAvailableTab;
+
+                    if (ListTab.Count() <= 1) Application.Current.Shutdown();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+            });
+        }
+
         //when user change tab
         public ReactiveCommand<Unit, Unit> ChangeTab
         {
@@ -101,6 +120,23 @@ namespace WpfApp1.View_Model
                     SelectedTab = ListTab.Count() - 2;
 
                     if (SelectedTab <= 0) SelectedTab = 0;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+            });
+        }
+
+        //when user press shortcut reopen tab
+        public ReactiveCommand<Unit, Unit> ShortcutReopenTab
+        {
+            get => ReactiveCommand.Create(() => {
+                try
+                {
+                    Items.ReopenTab();
+                    ListTab = new ObservableCollection<BrowserTabItem>(Items.List);
+                    SelectedTab = Items.IndexAvailableTab;
                 }
                 catch (Exception ex)
                 {

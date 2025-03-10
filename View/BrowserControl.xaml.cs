@@ -18,6 +18,9 @@ using System.Windows.Shapes;
 using WpfApp1.Model;
 using WpfApp1.View_Model;
 
+using Microsoft.Web.WebView2.Core;
+using System.Diagnostics;
+
 namespace WpfApp1.View
 {
     /// <summary>

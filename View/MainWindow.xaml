@@ -51,6 +51,11 @@
         </Style>
 
     </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Ctrl+Shift" Key="T" Command="{Binding ShortcutReopenTab}" />
+        <KeyBinding Modifiers="Ctrl" Key="T" Command="{Binding AddTab}" />
+        <KeyBinding Modifiers="Ctrl" Key="W" Command="{Binding ShortcutClose}" />
+    </Window.InputBindings>
     <Window.DataContext>
         <localVM:Main />
     </Window.DataContext>

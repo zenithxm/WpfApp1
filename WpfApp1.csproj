@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Helper\WebViewScript.js" />
     <None Remove="Resource\arrow-left.png" />
     <None Remove="Resource\arrow-right.png" />
     <None Remove="Resource\close.png" />

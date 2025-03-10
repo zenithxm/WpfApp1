@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Windows;
 using DynamicData;
 using WpfApp1.View_Model;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace WpfApp1.Model
 {
@@ -37,9 +38,17 @@ namespace WpfApp1.Model
         //list object tab
         private List<BrowserTabItem> _list = new();
         public List<BrowserTabItem> List
-        { 
-            get => _list; 
+        {
+            get => _list;
             set => _list = value;
+        }
+
+        //list close object tab
+        private List<BrowserTabItem> _listCloseTab = new();
+        public List<BrowserTabItem> ListCloseTab
+        {
+            get => _listCloseTab;
+            set => _listCloseTab = value;
         }
 
         //list history for all tab
@@ -113,7 +122,57 @@ namespace WpfApp1.Model
                 {
                     IndexAvailableTab = List.IndexOf(tempBrowserTabItem);
                     List.Remove(tempBrowserTabItem);
+                    ListCloseTab.Add(tempBrowserTabItem);
                     IndexAvailableTab--;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
+        //when user close tab
+        public void RemoveTab(int index)
+        {
+            try
+            {
+                if (index <= List.Count - 1)
+                {
+                    BrowserTabItem tempBrowserTabItem = List[index];
+                    IndexAvailableTab = index;
+                    if (tempBrowserTabItem != null)
+                    {
+                        List.Remove(tempBrowserTabItem);
+                        ListCloseTab.Add(tempBrowserTabItem);
+                        IndexAvailableTab--;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
+        //for reopen tab
+        public void ReopenTab()
+        {
+            try
+            {
+                _totalTabCreated++;
+
+                if (List != null)
+                {
+                    BrowserTabItem reopenTab = ListCloseTab[ListCloseTab.Count() - 1];
+                    ListCloseTab.RemoveAt(ListCloseTab.Count() - 1);
+
+                    BrowserTabItem reopenTab2 = new BrowserTabItem(reopenTab);
+                    List.Add(reopenTab2);
+
+                    BrowserTabItem lastTab = List[List.Count() - 2];
+                    List.RemoveAt(List.Count() - 2);
+                    List.Add(lastTab);
                 }
             }
             catch (Exception ex)
@@ -180,6 +239,22 @@ namespace WpfApp1.Model
                     VisibilityBtn = Visibility.Collapsed;
                     ReverseVisibilityBtn = Visibility.Visible;
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
+        public BrowserTabItem(BrowserTabItem reopenTab)
+        {
+            try
+            {
+                Name = reopenTab.Name;
+                Header = reopenTab.Header;
+                VisibilityBtn = reopenTab.VisibilityBtn;
+                ReverseVisibilityBtn = reopenTab.ReverseVisibilityBtn;
+                BrowserDataContext = reopenTab.BrowserDataContext;
             }
             catch (Exception ex)
             {

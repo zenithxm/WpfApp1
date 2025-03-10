@@ -29,6 +29,14 @@ namespace WpfApp1.View_Model
             set => this.RaiseAndSetIfChanged(ref _selectedTab, value);
         }
 
+        //to change size tab control so it trigger cache cleaning when tab got close
+        private bool _isTabRefresh = false;
+        public bool IsTabRefresh
+        {
+            get => _isTabRefresh;
+            set => this.RaiseAndSetIfChanged(ref _isTabRefresh, value);
+        }
+
         //main object
         private BrowserTab _items = new BrowserTab();
         public BrowserTab Items
@@ -61,7 +69,9 @@ namespace WpfApp1.View_Model
                 {
                     Items.RemoveTab(name);
                     ListTab = new ObservableCollection<BrowserTabItem>(Items.List);
-                    if(SelectedTab < 0) SelectedTab = Items.IndexAvailableTab;
+
+                    if (SelectedTab < 0) SelectedTab = Items.IndexAvailableTab;
+                    else IsTabRefresh = true; //for clean cache because selection not change
 
                     if (ListTab.Count() <= 1) Application.Current.Shutdown();
                 }

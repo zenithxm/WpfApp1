@@ -7,7 +7,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <Platforms>AnyCPU;x64</Platforms>
-    <SupportedOSPlatformVersion>10.0.26100.0</SupportedOSPlatformVersion> 
+    <SupportedOSPlatformVersion>10.0.26100.0</SupportedOSPlatformVersion>
+    <ApplicationIcon>browser.ico</ApplicationIcon>
+    <AssemblyName>BrowserGO</AssemblyName> 
   
   </PropertyGroup>
 
@@ -28,6 +30,10 @@
 
   <ItemGroup>
     <Page Remove="View\BrowserWIndow.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="browser.ico" />
   </ItemGroup>
 
   <ItemGroup>

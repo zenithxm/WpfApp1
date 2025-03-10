@@ -212,6 +212,8 @@ namespace WpfApp1.Model
         {
             try
             {
+                CurrentActiveAddress = CurrentActiveAddress.Replace("t=h_&", "").Replace("&ia=web", "");
+
                 //ignore homepage
                 if (ListHistory.Count == 0 && CurrentActiveAddress == _defaultHome) return;
 

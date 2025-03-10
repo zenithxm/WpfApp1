@@ -7,6 +7,7 @@ using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Markup;
 
@@ -229,15 +230,77 @@ namespace WpfApp1.Helper
             });
         }
 
+        //public class ContentManager
+        //{
+        //    TabControl _tabControl;
+        //    Decorator _border;
+
+        //    public ContentManager(TabControl tabControl, Decorator border)
+        //    {
+        //        _tabControl = tabControl;
+        //        _border = border;
+        //        _tabControl.SelectionChanged += (sender, args) => { UpdateSelectedTab(); };
+        //    }
+
+        //    public void ReplaceContainer(Decorator newBorder)
+        //    {
+        //        if (ReferenceEquals(_border, newBorder)) return;
+
+        //        _border.Child = null; // detach any tab content that old border may hold
+        //        _border = newBorder;
+        //    }
+
+        //    public void UpdateSelectedTab()
+        //    {
+        //        _border.Child = GetCurrentContent();
+        //    }
+
+        //    private ContentControl GetCurrentContent()
+        //    {
+        //        var item = _tabControl.SelectedItem;
+        //        if (item == null) return null;
+
+        //        var tabItem = _tabControl.ItemContainerGenerator.ContainerFromItem(item);
+        //        if (tabItem == null) return null;
+
+        //        var cachedContent = GetInternalCachedContent(tabItem);
+        //        if (cachedContent == null)
+        //        {
+        //            cachedContent = new ContentControl
+        //            {
+        //                DataContext = item,
+        //                ContentTemplate = GetTemplate(_tabControl),
+        //                ContentTemplateSelector = GetTemplateSelector(_tabControl)
+        //            };
+
+        //            cachedContent.SetBinding(ContentControl.ContentProperty, new Binding());
+        //            SetInternalCachedContent(tabItem, cachedContent);
+        //        }
+
+        //        return cachedContent;
+        //    }
+        //}
+
         public class ContentManager
         {
             TabControl _tabControl;
             Decorator _border;
+            int _numTab;
+            List<ContentControl> _listContentControl;
 
             public ContentManager(TabControl tabControl, Decorator border)
             {
                 _tabControl = tabControl;
                 _border = border;
+                _numTab = 0;
+                _listContentControl = new List<ContentControl>();
+
+                // Initialize cached content for all existing tabs
+                foreach (var item in _tabControl.Items)
+                {
+                    EnsureCachedContent(item);
+                }
+
                 _tabControl.SelectionChanged += (sender, args) => { UpdateSelectedTab(); };
             }
 
@@ -251,7 +314,63 @@ namespace WpfApp1.Helper
 
             public void UpdateSelectedTab()
             {
+                if (_numTab != _tabControl.Items.Count)
+                {
+                    // Initialize cached content for any new tabs added
+                    foreach (var item in _tabControl.Items)
+                    {
+                        EnsureCachedContent(item);
+                    }
+
+                    CleanCachedContent();
+                    _numTab = _tabControl.Items.Count;
+                }
+
                 _border.Child = GetCurrentContent();
+            }
+
+            private void CleanCachedContent()
+            {
+                List<object> listItem = _tabControl.Items.OfType<object>().ToList();
+                List<ContentControl> result = _listContentControl.Where(x => listItem.All(y => x.DataContext != y)).ToList();
+                _listContentControl.RemoveAll(x => result.Any(y => x == y));
+
+                foreach (ContentControl i in result)
+                {
+                    i.Content = null;
+                    i.ContentTemplate = null;
+                    i.ContentTemplateSelector = null;
+                }
+            }
+
+            private void EnsureCachedContent(object item)
+            {
+                var tabItem = _tabControl.ItemContainerGenerator.ContainerFromItem(item);
+                if (tabItem != null && !ReferenceEquals(tabItem, GetInternalCachedContent(tabItem)))
+                {
+                    if (GetInternalCachedContent(tabItem) == null)
+                    {
+                        if (_listContentControl.Where(x => x.DataContext == item).ToList().Count > 0)
+                        {
+                            var cachedContent = _listContentControl.Where(x => x.DataContext == item).First();
+                            SetInternalCachedContent(tabItem, cachedContent);
+                        }
+                        else
+                        {
+                            var cachedContent = new ContentControl
+                            {
+                                DataContext = item,
+                                ContentTemplate = GetTemplate(_tabControl),
+                                ContentTemplateSelector = GetTemplateSelector(_tabControl)
+                            };
+
+                            cachedContent.SetBinding(ContentControl.ContentProperty, new Binding());
+                            _listContentControl.Add(cachedContent);
+
+                            SetInternalCachedContent(tabItem, cachedContent);
+                        }
+                    }
+                }
             }
 
             private ContentControl GetCurrentContent()
@@ -262,21 +381,7 @@ namespace WpfApp1.Helper
                 var tabItem = _tabControl.ItemContainerGenerator.ContainerFromItem(item);
                 if (tabItem == null) return null;
 
-                var cachedContent = GetInternalCachedContent(tabItem);
-                if (cachedContent == null)
-                {
-                    cachedContent = new ContentControl
-                    {
-                        DataContext = item,
-                        ContentTemplate = GetTemplate(_tabControl),
-                        ContentTemplateSelector = GetTemplateSelector(_tabControl)
-                    };
-
-                    cachedContent.SetBinding(ContentControl.ContentProperty, new Binding());
-                    SetInternalCachedContent(tabItem, cachedContent);
-                }
-
-                return cachedContent;
+                return GetInternalCachedContent(tabItem);
             }
         }
     }

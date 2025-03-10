@@ -6,6 +6,7 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:local="clr-namespace:WpfApp1.View"
         xmlns:localVM="clr-namespace:WpfApp1.View_Model"
+        xmlns:helper="clr-namespace:WpfApp1.Helper"
         mc:Ignorable="d"
         Title="BrowserGO" Height="450" Width="800"
         Name="parentMain">
@@ -84,7 +85,7 @@
         <localVM:Main />
     </Window.DataContext>
     <Grid>
-        <TabControl x:Name="elMainControl"
+        <TabControl x:Name="elMainControl"  helper:TabContent.IsCached="True"
             SelectedIndex="{Binding SelectedTab}"
             ItemsSource="{Binding ListTab}">
             <TabControl.ItemTemplate>
@@ -107,14 +108,14 @@
                     </StackPanel>
                 </DataTemplate>
             </TabControl.ItemTemplate>
-            <TabControl.ContentTemplate>
+            <helper:TabContent.Template>
                 <DataTemplate>
                     <local:BrowserControl 
                         BrowserClass="{Binding BrowserDataContext, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                         AddTab="{Binding DataContext.AddTab, ElementName=parentMain}"
                         />
                 </DataTemplate>
-            </TabControl.ContentTemplate>
+            </helper:TabContent.Template>
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction Command="{Binding ChangeTab}" />

@@ -97,5 +97,7 @@
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </TabControl>
+        
+        <CheckBox IsChecked="{Binding IsTabRefresh}" Visibility="Collapsed" Checked="CheckBox_Checked"/>
     </Grid>
 </Window>

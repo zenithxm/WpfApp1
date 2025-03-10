@@ -304,6 +304,7 @@ namespace WpfApp1.Helper
                 }
 
                 _tabControl.SelectionChanged += (sender, args) => { UpdateSelectedTab(); };
+                _tabControl.SizeChanged += (sender, args) => { CleanCachedContent(); };
             }
 
             public void ReplaceContainer(Decorator newBorder)

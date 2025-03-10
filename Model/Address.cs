@@ -178,7 +178,7 @@ namespace WpfApp1.Model
                 }
 
                 CurrentActiveAddress = SetCompleteURL(tempAddress);
-                CurrentNameAddress = tempName;
+                CurrentNameAddress = tempName.Replace('+',' ');
             }
             catch (Exception ex)
             {

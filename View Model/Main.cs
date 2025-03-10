@@ -61,7 +61,7 @@ namespace WpfApp1.View_Model
                 {
                     Items.RemoveTab(name);
                     ListTab = new ObservableCollection<BrowserTabItem>(Items.List);
-                    SelectedTab = Items.IndexAvailableTab;
+                    if(SelectedTab < 0) SelectedTab = Items.IndexAvailableTab;
 
                     if (ListTab.Count() <= 1) Application.Current.Shutdown();
                 }
@@ -80,7 +80,7 @@ namespace WpfApp1.View_Model
                 {
                     Items.RemoveTab(SelectedTab);
                     ListTab = new ObservableCollection<BrowserTabItem>(Items.List);
-                    SelectedTab = Items.IndexAvailableTab;
+                    if (SelectedTab < 0) SelectedTab = Items.IndexAvailableTab;
 
                     if (ListTab.Count() <= 1) Application.Current.Shutdown();
                 }

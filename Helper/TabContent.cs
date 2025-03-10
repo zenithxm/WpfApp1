@@ -10,6 +10,8 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Markup;
+using WpfApp1.Model;
+using WpfApp1.View_Model;
 
 namespace WpfApp1.Helper
 {
@@ -314,7 +316,8 @@ namespace WpfApp1.Helper
 
             public void UpdateSelectedTab()
             {
-                if (_numTab != _tabControl.Items.Count)
+                //commented because close and reopen immediately will cause empty page
+                //if (_numTab != _tabControl.Items.Count)
                 {
                     // Initialize cached content for any new tabs added
                     foreach (var item in _tabControl.Items)
@@ -333,7 +336,7 @@ namespace WpfApp1.Helper
             {
                 List<object> listItem = _tabControl.Items.OfType<object>().ToList();
                 List<ContentControl> result = _listContentControl.Where(x => listItem.All(y => x.DataContext != y)).ToList();
-                _listContentControl.RemoveAll(x => result.Any(y => x == y));
+                _listContentControl.RemoveAll(x => result.Any(y => ((BrowserTabItem)x.Content).Name == ((BrowserTabItem)y.Content).Name));
 
                 foreach (ContentControl i in result)
                 {
@@ -353,6 +356,12 @@ namespace WpfApp1.Helper
                         if (_listContentControl.Where(x => x.DataContext == item).ToList().Count > 0)
                         {
                             var cachedContent = _listContentControl.Where(x => x.DataContext == item).First();
+
+                            cachedContent.DataContext = item;
+                            cachedContent.ContentTemplate = GetTemplate(_tabControl);
+                            cachedContent.ContentTemplateSelector = GetTemplateSelector(_tabControl);
+
+                            cachedContent.SetBinding(ContentControl.ContentProperty, new Binding());
                             SetInternalCachedContent(tabItem, cachedContent);
                         }
                         else

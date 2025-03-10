@@ -136,7 +136,7 @@ namespace WpfApp1.View_Model
                 {
                     Items.ReopenTab();
                     ListTab = new ObservableCollection<BrowserTabItem>(Items.List);
-                    SelectedTab = Items.IndexAvailableTab;
+                    if (SelectedTab < 0) SelectedTab = Items.IndexAvailableTab;
                 }
                 catch (Exception ex)
                 {

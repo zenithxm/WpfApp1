@@ -73,7 +73,7 @@ namespace WpfApp1.View_Model
                     if (SelectedTab < 0) SelectedTab = Items.IndexAvailableTab;
                     else IsTabRefresh = true; //for clean cache because selection not change
 
-                    if (ListTab.Count() <= 1) Application.Current.Shutdown();
+                    if (ListTab.Count <= 1) Application.Current.Shutdown();
                 }
                 catch (Exception ex)
                 {
@@ -92,7 +92,7 @@ namespace WpfApp1.View_Model
                     ListTab = new ObservableCollection<BrowserTabItem>(Items.List);
                     if (SelectedTab < 0) SelectedTab = Items.IndexAvailableTab;
 
-                    if (ListTab.Count() <= 1) Application.Current.Shutdown();
+                    if (ListTab.Count <= 1) Application.Current.Shutdown();
                 }
                 catch (Exception ex)
                 {
@@ -107,7 +107,7 @@ namespace WpfApp1.View_Model
             get => ReactiveCommand.Create(() => {
                 try
                 {
-                    if (SelectedTab != 0 && SelectedTab == Items.List.Count() - 1)
+                    if (SelectedTab != 0 && SelectedTab == Items.List.Count - 1)
                     {
                         AddTab.Execute().Subscribe();
                     }
@@ -127,7 +127,7 @@ namespace WpfApp1.View_Model
                 {
                     Items.AddTab("New Tab");
                     ListTab = new ObservableCollection<BrowserTabItem>(Items.List);
-                    SelectedTab = ListTab.Count() - 2;
+                    SelectedTab = ListTab.Count - 2;
 
                     if (SelectedTab <= 0) SelectedTab = 0;
                 }
@@ -153,6 +153,20 @@ namespace WpfApp1.View_Model
                     Debug.WriteLine(ex.Message);
                 }
             });
+        }
+
+        //for helper drag and drop call, because it cannot update list in there
+        public void DragDropHelperUpdateList(List<BrowserTabItem> list)
+        {
+            Items.List = list.ToList();
+            ListTab = new ObservableCollection<BrowserTabItem>(Items.List);
+        }
+
+        //for helper drag and drop call, because it cannot update list in there
+        public void DragDropHelperUpdateList(int removeIndex, int insertIndex)
+        {
+            Items.ReorderTab(removeIndex, insertIndex);
+            ListTab = new ObservableCollection<BrowserTabItem>(Items.List);
         }
 
         public Main()

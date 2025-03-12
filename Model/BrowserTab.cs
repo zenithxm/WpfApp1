@@ -16,6 +16,7 @@ using System.Windows;
 using DynamicData;
 using WpfApp1.View_Model;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Windows.Forms;
 
 namespace WpfApp1.Model
 {
@@ -99,8 +100,8 @@ namespace WpfApp1.Model
 
                     if (header != "+")
                     {
-                        BrowserTabItem lastTab = List[List.Count() - 2];
-                        List.RemoveAt(List.Count() - 2);
+                        BrowserTabItem lastTab = List[List.Count - 2];
+                        List.RemoveAt(List.Count - 2);
                         List.Add(lastTab);
                     }
                 }
@@ -111,7 +112,7 @@ namespace WpfApp1.Model
             }
         }
 
-        //when user close tab
+        //when user close tab using button
         public void RemoveTab(string name)
         {
             try
@@ -132,7 +133,7 @@ namespace WpfApp1.Model
             }
         }
 
-        //when user close tab
+        //when user close tab using shortcut
         public void RemoveTab(int index)
         {
             try
@@ -164,16 +165,39 @@ namespace WpfApp1.Model
 
                 if (List != null)
                 {
-                    BrowserTabItem reopenTab = ListCloseTab[ListCloseTab.Count() - 1];
-                    ListCloseTab.RemoveAt(ListCloseTab.Count() - 1);
+                    BrowserTabItem reopenTab = ListCloseTab[ListCloseTab.Count - 1];
+                    ListCloseTab.RemoveAt(ListCloseTab.Count - 1);
 
                     BrowserTabItem reopenTab2 = new BrowserTabItem(reopenTab);
                     List.Add(reopenTab2);
 
-                    BrowserTabItem lastTab = List[List.Count() - 2];
-                    List.RemoveAt(List.Count() - 2);
+                    BrowserTabItem lastTab = List[List.Count - 2];
+                    List.RemoveAt(List.Count - 2);
                     List.Add(lastTab);
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
+        //for reorder tab
+        public void ReorderTab(int removeIndex, int insertIndex)
+        {
+            try
+            {
+                //if it try put in lastest tab, ignore it
+                if (insertIndex == List.Count - 1)
+                    return;
+
+                //if user try move the latest tab, ignore it
+                if (removeIndex == List.Count - 1)
+                    return;
+
+                BrowserTabItem tabItem = List[removeIndex];
+                List.RemoveAt(removeIndex);
+                List.Insert(insertIndex, tabItem);
             }
             catch (Exception ex)
             {

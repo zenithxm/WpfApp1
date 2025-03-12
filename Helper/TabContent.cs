@@ -15,6 +15,11 @@ using WpfApp1.View_Model;
 
 namespace WpfApp1.Helper
 {
+    //https://stackoverflow.com/a/9802346
+    //https://stackoverflow.com/a/25745319
+    //https://www.codeproject.com/Articles/460989/WPF-TabControl-Turning-Off-Tab-Virtualization
+    //modify to handle add/remove dynamically
+
     /// <summary>
     /// Attached properties for persistent tab control
     /// </summary>

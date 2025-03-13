@@ -49,8 +49,15 @@ namespace WpfApp1.View_Model
         private ObservableCollection<BrowserTabItem> _listTab = new();
         public ObservableCollection<BrowserTabItem> ListTab
         {
-            get => _listTab;
-            set => this.RaiseAndSetIfChanged(ref _listTab, value);
+            get
+            {
+                return _listTab;
+            }
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _listTab, value);
+                Items.List = new List<BrowserTabItem>(_listTab);
+            }
         }
 
         //main binding history

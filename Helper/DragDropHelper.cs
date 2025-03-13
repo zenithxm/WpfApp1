@@ -229,21 +229,20 @@ namespace WpfApp1.Helper
 			e.Handled = true;
 		}
 
-		private void DropTarget_PreviewDrop(object sender, DragEventArgs e)
-		{
-			object draggedItem = e.Data.GetData(this.format.Name);
-			int indexRemoved = -1;
+        private void DropTarget_PreviewDrop(object sender, DragEventArgs e)
+        {
+            object draggedItem = e.Data.GetData(this.format.Name);
+            int indexRemoved = -1;
 
-			if (draggedItem != null)
-            {                
-				if ((e.Effects & DragDropEffects.Move) != 0)
-				{
+            if (draggedItem != null)
+            {
+                if ((e.Effects & DragDropEffects.Move) != 0)
+                {
                     //change to delete after add tab so it can save the cache
                     indexRemoved = this.sourceItemsControl.Items.IndexOf(draggedItem);
                     //indexRemoved = DDUtilities.RemoveItemFromItemsControl(this.sourceItemsControl, draggedItem, indexRemoved);
                 }
 
-				//no need for this part because it delete after add
 				// This happens when we drag an item to a later position within the same ItemsControl.
 				if (indexRemoved != -1 && this.sourceItemsControl == this.targetItemsControl && indexRemoved < this.insertionIndex)
 				{
@@ -259,11 +258,52 @@ namespace WpfApp1.Helper
 				if (tabControl != null)
 				{
 					((Main)tabControl.DataContext).DragDropHelperUpdateList(indexRemoved, this.insertionIndex);
-                }
+				}
 
-                RemoveDraggedAdorner();
+				RemoveDraggedAdorner();
                 RemoveInsertionAdorner();
             }
+            e.Handled = true;
+        }
+
+		private void DropTarget_PreviewDrop_NotUse(object sender, DragEventArgs e)
+		{
+			object draggedItem = e.Data.GetData(this.format.Name);
+			int indexRemoved = -1;
+
+			if (draggedItem != null)
+			{
+				if ((e.Effects & DragDropEffects.Move) != 0)
+				{
+					//change to delete after add tab so it can save the cache
+					indexRemoved = this.sourceItemsControl.Items.IndexOf(draggedItem);
+
+					//if delete first and add later it will remove cache
+					//indexRemoved = DDUtilities.RemoveItemFromItemsControl(this.sourceItemsControl, draggedItem, indexRemoved);
+				}
+
+				//no need for this part because it delete after add
+				//// This happens when we drag an item to a later position within the same ItemsControl.
+				//if (indexRemoved != -1 && this.sourceItemsControl == this.targetItemsControl && indexRemoved < this.insertionIndex)
+				//{
+				//	this.insertionIndex--;
+				//}
+
+				//DDUtilities.InsertItemInItemsControl(this.targetItemsControl, draggedItem, this.insertionIndex);
+				((IList)this.targetItemsControl.ItemsSource).Insert(this.insertionIndex, draggedItem);
+
+				//becaus ewe add first it may need to adjust remove index if it move to beginning
+				if (indexRemoved != -1 && this.sourceItemsControl == this.targetItemsControl && indexRemoved > this.insertionIndex)
+				{
+					indexRemoved++;
+				}
+
+				//indexRemoved = DDUtilities.RemoveItemFromItemsControl(this.sourceItemsControl, draggedItem, indexRemoved);
+				((IList)this.sourceItemsControl.ItemsSource).RemoveAt(indexRemoved); //delete not update the source properly
+
+				RemoveDraggedAdorner();
+				RemoveInsertionAdorner();
+			}
 			e.Handled = true;
 		}
 
@@ -375,22 +415,22 @@ namespace WpfApp1.Helper
 
 		private void TopWindow_DragEnter(object sender, DragEventArgs e)
 		{
-			ShowDraggedAdorner(e.GetPosition(this.topWindow));
-			e.Effects = DragDropEffects.None;
-			e.Handled = true;
+			//ShowDraggedAdorner(e.GetPosition(this.topWindow));
+			//e.Effects = DragDropEffects.None;
+			//e.Handled = true;
 		}
 
 		private void TopWindow_DragOver(object sender, DragEventArgs e)
 		{
-			ShowDraggedAdorner(e.GetPosition(this.topWindow));
-			e.Effects = DragDropEffects.None;
-			e.Handled = true;
+			//ShowDraggedAdorner(e.GetPosition(this.topWindow));
+			//e.Effects = DragDropEffects.None;
+			//e.Handled = true;
 		}
 
 		private void TopWindow_DragLeave(object sender, DragEventArgs e)
 		{
-			RemoveDraggedAdorner();
-			e.Handled = true;
+			//RemoveDraggedAdorner();
+			//e.Handled = true;
 		}
 
 		// Adorners
@@ -398,21 +438,21 @@ namespace WpfApp1.Helper
 		// Creates or updates the dragged Adorner. 
 		private void ShowDraggedAdorner(Point currentPosition)
 		{
-			if (this.draggedAdorner == null)
-			{
-				var adornerLayer = AdornerLayer.GetAdornerLayer(this.sourceItemsControl);
-				this.draggedAdorner = new DDDraggedAdorner(this.draggedData, GetDragDropTemplate(this.sourceItemsControl), this.sourceItemContainer, adornerLayer);
-			}
-			this.draggedAdorner.SetPosition(currentPosition.X - this.initialMousePosition.X + this.initialMouseOffset.X, currentPosition.Y - this.initialMousePosition.Y + this.initialMouseOffset.Y);
+			//if (this.draggedAdorner == null)
+			//{
+			//	var adornerLayer = AdornerLayer.GetAdornerLayer(this.sourceItemsControl);
+			//	this.draggedAdorner = new DDDraggedAdorner(this.draggedData, GetDragDropTemplate(this.sourceItemsControl), this.sourceItemContainer, adornerLayer);
+			//}
+			//this.draggedAdorner.SetPosition(currentPosition.X - this.initialMousePosition.X + this.initialMouseOffset.X, currentPosition.Y - this.initialMousePosition.Y + this.initialMouseOffset.Y);
 		}
 
 		private void RemoveDraggedAdorner()
 		{
-			if (this.draggedAdorner != null)
-			{
-				this.draggedAdorner.Detach();
-				this.draggedAdorner = null;
-			}
+			//if (this.draggedAdorner != null)
+			//{
+			//	this.draggedAdorner.Detach();
+			//	this.draggedAdorner = null;
+			//}
 		}
 
 		private void CreateInsertionAdorner()
@@ -523,10 +563,7 @@ namespace WpfApp1.Helper
                     else if (itemsSource is IList)
                     {
                         ((IList)itemsSource).RemoveAt(indexToBeRemoved);
-
-						//need to reassign back or sometimes it will not update the control
-						//itemsControl.ItemsSource = itemsSource;
-                    }
+					}
                     else
                     {
                         Type type = itemsSource.GetType();

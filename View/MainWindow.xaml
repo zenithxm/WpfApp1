@@ -64,7 +64,7 @@
             helper:DragDropHelper.IsDragSource="true"
             helper:DragDropHelper.IsDropTarget="true"
             SelectedIndex="{Binding SelectedTab}"
-            ItemsSource="{Binding ListTab}">
+            ItemsSource="{Binding ListTab, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <StackPanel 
